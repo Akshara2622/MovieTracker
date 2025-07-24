@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Favorite Movies</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>🎬 My Favorite Movies</h1>
+    </header>
+
+    <main>
+        <section class="movie-form">
+            <h2>Add a New Movie</h2>
+            <form id="movieForm">
+                <input type="text" id="title" placeholder="Movie Title" required>
+                <textarea id="description" placeholder="Short Description" required></textarea>
+                <button type="submit">Add Movie</button>
+            </form>
+        </section>
+
+        <section class="movie-list" id="movieList">
+            <!-- Movies will be added here dynamically -->
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 My Movie Tracker</p>
+    </footer>
+
+    <script>
+        const form = document.getElementById('movieForm');
+        const movieList = document.getElementById('movieList');
+
+        // Load movies from localStorage
+        let movies = JSON.parse(localStorage.getItem('movies')) || [];
+
+        function saveMovies() {
+            localStorage.setItem('movies', JSON.stringify(movies));
+        }
+
+        function renderMovies() {
+            movieList.innerHTML = '';
+            movies.forEach((movie, index) => {
+                const movieCard = document.createElement('div');
+                movieCard.className = 'movie-card';
+
+                const titleEl = document.createElement('h2');
+                titleEl.textContent = movie.title;
+
+                const descEl = document.createElement('p');
+                descEl.textContent = movie.description;
+
+                const editBtn = document.createElement('button');
+                editBtn.textContent = 'Edit';
+                editBtn.className = 'edit-btn';
+                editBtn.onclick = () => {
+                    const newTitle = prompt('Edit movie title:', movie.title);
+                    const newDesc = prompt('Edit description:', movie.description);
+                    if (newTitle) movie.title = newTitle;
+                    if (newDesc) movie.description = newDesc;
+                    saveMovies();
+                    renderMovies();
+                };
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.onclick = () => {
+                    movies.splice(index, 1);
+                    saveMovies();
+                    renderMovies();
+                };
+
+                const hr = document.createElement('hr');
+
+                movieCard.appendChild(titleEl);
+                movieCard.appendChild(descEl);
+                movieCard.appendChild(editBtn);
+                movieCard.appendChild(deleteBtn);
+                movieCard.appendChild(hr);
+
+                movieList.appendChild(movieCard);
+            });
+        }
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+
+            movies.push({ title, description });
+            saveMovies();
+            renderMovies();
+            form.reset();
+        });
+
+        // Initial render
+        renderMovies();
+    </script>
+</body>
+</html>
